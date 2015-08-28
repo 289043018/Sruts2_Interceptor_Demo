@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+"http://struts.apache.org/dtds/struts-2.3.dtd">
+<!-- 配置根元素 -->
+<struts>
+<!-- bean标签用于一个JavaBean实例 -->
+
+   <!--  constant标签用于Struts2默认行为标签 -->
+<!--    配置web默认编码集，相当于HttpServletRequest.setChartacterIncoding用法 -->
+  <constant name="struts.i18n.encoding" value="UTF-8"></constant>
+<!--   开启动态方法调用功能，系统默认是false，如果不设置成true，则无法在action中设置调用指定的方法。 -->
+  <constant name="struts.enable.DynamicMethodInvocation" value="true" />
+<!--   默认的Struts2的请求后缀是.action，也就是说我们不配置该元素.也就是说我们这里设置了action/do都会被拦截 -->
+  <constant name="struts.action.extension" value="action,do"></constant>
+  	<!-- 设置浏览器是否缓存静态内容，默认值为true。在我们开发阶段，建议修改为false，防止修改后测试不到 -->
+  	<constant name="struts.serve.static.browserCache" value="false"></constant>
+  	<!-- 当struts配置文件修改之后，系统是否自动重新加载该文件，默认为false，部署到服务器之后就可以改为false -->
+  	<constant name="struts.configuration.xml.reload" value="true"></constant>
+  	<!-- 开发模式下使用，这样可以打印出更加详细的错误信息，便于调试 -->
+  	<constant name="struts.devMode" value="true"></constant>
+  	<!-- 默认视图主题 -->
+  	<constant name="struts.ui.theme" value="simple"></constant>
+<!--   package标签包标签，用于区分不同的请求文件的标签，比方说
+  	网站前台请求和网站后台请求 -->
+  	<!-- name属性：包名，用于被别的包调用或者继承 -->
+  	<package name="test" extends="struts-default">
+  	<!-- 配置过滤器 -->
+  	<interceptors>
+  		<interceptor name="FirstInter" class="com.hand.interceptor.FirstInterceptor">
+  			<!-- 初始化拦截器的值，name是指在拦截器内的参数。 -->
+  			<param name="someThing">admin</param>
+  		</interceptor>
+  		<interceptor name="SecondInter" class="com.hand.interceptor.SecondInterceptor">
+  		</interceptor>
+  		<!-- 方法拦截器 -->
+  		<interceptor name="MethodInter" class="com.hand.interceptor.MethodInterceptor">
+  			<!-- 添加拦截的方法 -->
+  			<param name="includeMethods">add,delete</param>
+  			<!-- 也可以不设置拦截的方法，直接设置不拦截的方法。以下代码是不拦截add和delete方法，其他方法都拦截： -->
+			<!-- <param name="excludeMethods">add,delete</param>  -->
+  		</interceptor>
+  		<interceptor-stack name="AllInterceptor">
+  		<interceptor-ref name="FirstInter"></interceptor-ref>
+  	 	<interceptor-ref name="SecondInter"></interceptor-ref>
+  		<!-- 在设置拦截器的时候，一定要加上struts的默认拦截器。 -->
+  	 	<interceptor-ref name="defaultStack"></interceptor-ref>
+  		</interceptor-stack>
+  	</interceptors>
+  	<!-- 为系统设置一个默认的拦截器，这样在action中不指定拦截器，也会进入默认的拦截器AllInterceptor -->
+  	<default-interceptor-ref name="AllInterceptor"/>
+  	<!-- 可以使用global-result设置全局返回，这样系统中所有的返回都会返回该结果 -->
+  	
+  	<!-- action相当于以前的servlet的概念，对应一个请求name为请求的url地址 
+  	 localhost：8080/项目名/new/login.do
+  	-->
+  	 <action name="*_*" class="com.hand.action.{1}Action" method="{2}">
+  	 <!-- 设置拦截器路径 -->
+		<interceptor-ref name="MethodInter"/>
+		<interceptor-ref name="defaultStack"/>
+  	 <result name="{1}success">{1}login.jsp</result>
+  	 </action>
+  	 <action name="loginAction" class="com.hand.action.LoginAction">
+  	 	<interceptor-ref name="AllInterceptor"/>
+  	 	<result name="success">/login.jsp</result>
+  	 </action>
+  	</package>
+  	
+<!--   	include标签用于引入其他的xml配置文件 -->
+
+</struts>
